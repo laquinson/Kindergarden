@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>小動物數學派對</title>
+    <title>小動物數學派對 - V8 視覺修正版</title>
     <style>
         :root {
             --primary: #FF6B6B;
@@ -19,7 +19,7 @@
         body {
             margin: 0;
             padding: 0;
-            font-family: 'Comic Sans MS', 'Chalkboard SE', 'PingFang TC', sans-serif;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'PingFang HK', sans-serif;
             background-color: var(--bg);
             color: #2F3E46;
             overflow: hidden;
@@ -29,34 +29,34 @@
             justify-content: center;
             height: 100vh;
         }
-        /* 主選單與導覽 */
+        /* 主選單 */
         #nav-menu {
             display: flex;
             gap: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             z-index: 10;
         }
         .nav-btn {
             background-color: white;
             border: 4px solid var(--secondary);
             border-radius: 20px;
-            padding: 12px 24px;
-            font-size: 1.2rem;
+            padding: 8px 18px;
+            font-size: 1.1rem;
             font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 6px 0 var(--secondary);
+            box-shadow: 0 5px 0 var(--secondary);
             transition: all 0.1s;
         }
         .nav-btn.active {
             background-color: var(--accent);
             transform: translateY(4px);
-            box-shadow: 0 2px 0 var(--secondary);
+            box-shadow: 0 1px 0 var(--secondary);
         }
-        /* 遊戲主要舞台 */
+        /* 遊戲舞台 */
         #game-stage {
-            width: 90vw;
-            height: 70vh;
-            max-width: 800px;
+            width: 94vw;
+            height: 74vh;
+            max-width: 820px;
             background: white;
             border: 8px solid #4A5759;
             border-radius: 30px;
@@ -65,111 +65,217 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding: 20px;
+            justify-content: flex-start;
+            padding: 15px;
         }
         /* 語音提示條 */
         #audio-hint-bar {
             background: var(--accent);
-            padding: 10px 20px;
+            padding: 8px 18px;
             border-radius: 15px;
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             font-weight: bold;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             border: 3px solid #2F3E46;
-            cursor: pointer;
             display: flex;
             align-items: center;
             gap: 10px;
+            width: 100%;
         }
-        /* 遊戲 1：十格陣 */
-        .ten-frame {
+        #mute-btn {
+            cursor: pointer;
+            font-size: 1.5rem;
+            padding: 2px 8px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.5);
+        }
+        #hint-text {
+            cursor: pointer;
+            flex-grow: 1;
+        }
+        /* 算式顯示區 */
+        .formula-display {
+            font-size: 2.6rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #1A73E8;
+            background: #E8F0FE;
+            padding: 6px 20px;
+            border-radius: 20px;
+            letter-spacing: 3px;
+            min-height: 55px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+        /* 遊戲 1：十五格陣小怪獸 */
+        .ten-frame-15 {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            grid-template-rows: repeat(2, 1fr);
-            gap: 12px;
+            grid-template-rows: repeat(3, 1fr);
+            gap: 10px;
             width: 85%;
-            max-width: 500px;
+            max-width: 450px;
             background: #E8F0FE;
-            padding: 15px;
+            padding: 12px;
             border-radius: 20px;
             border: 5px dashed #1A73E8;
+            margin-top: 10px;
         }
         .grid-cell {
             aspect-ratio: 1;
             background: white;
             border: 3px solid #B0CBD6;
-            border-radius: 15px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.5rem;
-            transition: transform 0.2s;
+            font-size: 2.3rem;
         }
-        /* 遊戲 2：翹翹板 */
-        .seesaw-container {
+        /* 遊戲 2：天秤直向結構 */
+        .seesaw-layout-v2 {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            flex-grow: 1;
+        }
+        /* 橫向的按鈕計數器 */
+        .stepper-horizontal {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 20px;
+            background: #F0F4F8;
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: 3px solid #CBD5E1;
+            margin-bottom: 5px;
+        }
+        .stepper-btn {
+            width: 55px;
+            height: 55px;
+            border-radius: 15px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+        }
+        .btn-up { background: #34D399; box-shadow: 0 4px 0 #059669; }
+        .btn-up:active { transform: translateY(2px); box-shadow: 0 2px 0 #059669; }
+        .btn-down { background: #F87171; box-shadow: 0 4px 0 #DC2626; }
+        .btn-down:active { transform: translateY(2px); box-shadow: 0 2px 0 #DC2626; }
+        
+        .counter-display {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: white;
+            padding: 5px 15px;
+            border-radius: 10px;
+            border: 2px solid #94A3B8;
+            min-width: 60px;
+            text-align: center;
+        }
+        /* 天秤主容器 */
+        .seesaw-container-v2 {
             position: relative;
             width: 100%;
-            height: 200px;
+            height: 150px;
             display: flex;
             justify-content: center;
             align-items: flex-end;
+            margin-top: 5px;
         }
         .seesaw-board {
-            width: 80%;
+            width: 85%;
             height: 15px;
             background: #8B5A2B;
             border-radius: 10px;
             position: relative;
             transform-origin: center bottom;
             transition: transform 0.5s ease-in-out;
-            display: flex;
-            justify-content: space-between;
-            padding: 0 40px;
-            box-sizing: border-box;
+            z-index: 2;
         }
         .seesaw-base {
             position: absolute;
             bottom: 0;
             width: 0;
             height: 0;
-            border-left: 30px solid transparent;
-            border-right: 30px solid transparent;
-            border-bottom: 50px solid #4A5759;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-bottom: 35px solid #4A5759;
+            z-index: 1;
         }
+        /* 【全新修改】將放置區設為絕對定位，死死貼齊木板上方 (bottom: 15px) */
         .weight-zone {
+            position: absolute;
+            bottom: 15px; 
             display: flex;
-            flex-direction: column-reverse;
+            flex-direction: column-reverse; /* 積木由下往上堆疊 */
             align-items: center;
-            margin-bottom: 15px;
+            width: 50px;
             min-height: 100px;
         }
+        /* 左右兩端精準定位 */
+        #left-zone {
+            left: 35px;
+        }
+        #right-zone {
+            right: 35px;
+        }
         .weight-block {
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            font-size: 1.5rem;
-            color: white;
-            animation: bounceIn 0.3s;
+            font-size: 1.3rem;
+            margin-bottom: 2px; /* 積木之間的微小間距 */
+            animation: bounceIn 0.2s;
         }
-        .weight-red { background: var(--primary); border: 3px solid #C84B4B; }
-        .weight-blue { background: var(--secondary); border: 3px solid #37A19A; }
+        .weight-red { background: var(--primary); border: 2px solid #C84B4B; }
+        .weight-blue { background: var(--secondary); border: 2px solid #37A19A; }
+        
+        /* 確定檢查按鈕 */
+        .submit-btn {
+            background: #1A73E8;
+            color: white;
+            font-size: 1.4rem;
+            font-weight: bold;
+            padding: 10px 40px;
+            border-radius: 25px;
+            border: none;
+            box-shadow: 0 4px 0 #0D47A1;
+            cursor: pointer;
+            margin-top: auto;
+            margin-bottom: 5px;
+            z-index: 5;
+        }
+        .submit-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #0D47A1;
+        }
 
-        /* 遊戲 3：吃餅乾 */
+        /* 遊戲 3：動態減法與餅乾 */
         .cookie-jar {
             display: flex;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 15px;
             justify-content: center;
-            max-width: 500px;
+            max-width: 450px;
+            margin-top: 15px;
         }
         .cookie {
-            width: 75px;
-            height: 75px;
+            width: 70px;
+            height: 70px;
             background: #D2B48C;
             border: 4px solid #8B5A2B;
             border-radius: 50%;
@@ -178,13 +284,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2rem;
+            font-size: 1.8rem;
             box-shadow: 0 4px 0 #8B5A2B;
         }
         .cookie::before {
             content: '• •\n• •';
             color: #4A2711;
-            font-size: 1rem;
+            font-size: 0.9rem;
             position: absolute;
         }
         .cookie.eaten {
@@ -194,33 +300,31 @@
             transition: all 0.3s ease;
         }
 
-        /* 答案選擇區（大按鈕防呆） */
+        /* 答案按鈕區 */
         .options-zone {
             margin-top: auto;
             display: flex;
-            gap: 20px;
+            gap: 15px;
             width: 100%;
             justify-content: center;
-            padding-top: 15px;
+            padding-bottom: 5px;
         }
         .option-btn {
-            width: 75px;
-            height: 75px;
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
             background: white;
             border: 5px solid var(--primary);
             font-size: 2rem;
             font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 6px 0 var(--primary);
-            transition: transform 0.1s;
+            box-shadow: 0 5px 0 var(--primary);
         }
         .option-btn:active {
-            transform: translateY(4px);
+            transform: translateY(3px);
             box-shadow: 0 2px 0 var(--primary);
         }
 
-        /* 特效與動畫 */
         @keyframes bounceIn {
             0% { transform: scale(0.3); opacity: 0; }
             50% { transform: scale(1.1); }
@@ -231,37 +335,52 @@
         }
         @keyframes win {
             from { transform: scale(1); }
-            to { transform: scale(1.05); background-color: #FFF2B2; }
+            to { transform: scale(1.02); background-color: #FFF9E6; }
         }
     </style>
 </head>
 <body>
 
     <div id="nav-menu">
-        <button class="nav-btn active" onclick="switchGame(1)">1. 十格小怪獸</button>
+        <button class="nav-btn active" onclick="switchGame(1)">1. 15內小怪獸</button>
         <button class="nav-btn" onclick="switchGame(2)">2. 數字翹翹板</button>
         <button class="nav-btn" onclick="switchGame(3)">3. 餅乾不見了</button>
     </div>
 
-    <div id="audio-hint-bar" onclick="speakHint()">
-        🔊 <span id="hint-text">點擊上方按鈕開始遊戲！</span>
+    <div id="audio-hint-bar">
+        <span id="mute-btn" onclick="toggleMute()">🔊</span>
+        <span id="hint-text" onclick="speakHint()">點選上方按鈕開始玩啦！</span>
     </div>
 
-    <div id="game-stage">
-        </div>
+    <div id="game-stage"></div>
 
 <script>
     let currentGame = 1;
     let answer = 0;
     let currentHint = "";
     let gameData = {};
+    let isMuted = false;
 
-    // 繁體中文語音引導功能 (iPad 友善)
+    function toggleMute() {
+        isMuted = !isMuted;
+        const muteBtn = document.getElementById('mute-btn');
+        if (isMuted) {
+            muteBtn.innerText = "🔇";
+            window.speechSynthesis.cancel();
+            document.getElementById('hint-text').innerText = "（語音已關閉）" + currentHint;
+        } else {
+            muteBtn.innerText = "🔊";
+            document.getElementById('hint-text').innerText = currentHint;
+            speak(currentHint);
+        }
+    }
+
     function speak(text) {
+        if (isMuted) return;
         window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'zh-TW';
-        utterance.rate = 0.9; // 稍微放慢語速，適合4歲孩子
+        utterance.lang = 'zh-HK'; 
+        utterance.rate = 0.85; 
         window.speechSynthesis.speak(utterance);
     }
 
@@ -269,7 +388,16 @@
         speak(currentHint);
     }
 
-    // 初始化與遊戲切換
+    function updateHintDisplay(text) {
+        currentHint = text;
+        const hintSpan = document.getElementById('hint-text');
+        if (isMuted) {
+            hintSpan.innerText = "（語音已關閉）" + text;
+        } else {
+            hintSpan.innerText = text;
+        }
+    }
+
     function switchGame(gameNum) {
         currentGame = gameNum;
         document.querySelectorAll('.nav-btn').forEach((btn, idx) => {
@@ -284,79 +412,143 @@
         setTimeout(speakHint, 300);
     }
 
-    // --- 遊戲 1：十格陣小怪獸 ---
+    // --- 遊戲 1 ---
     function initGame1() {
-        const num1 = Math.floor(Math.random() * 4) + 1; // 1~4
-        const num2 = Math.floor(Math.random() * 3) + 1; // 1~3
-        answer = num1 + num2;
-        currentHint = `有 ${num1} 隻紅怪獸，又來了 ${num2} 隻藍怪獸，合起來一共有幾隻呢？`;
-        document.getElementById('hint-text').innerText = currentHint;
+        const num1 = Math.floor(Math.random() * 7) + 3; 
+        const num2 = Math.floor(Math.random() * 5) + 2; 
+        answer = num1 + num2; 
+        gameData = { num1: num1, num2: num2 };
 
-        let gridHtml = '<div class="ten-frame">';
-        for (let i = 0; i < 10; i++) {
+        updateHintDisplay(`有 ${num1} 隻粉紅怪獸，又嚟咗 ${num2} 隻藍色怪獸，夾埋一共有幾多隻怪獸呀？`);
+
+        let htmlContent = `
+            <div class="formula-display" id="plus-formula">${num1} + ${num2} = </div>
+            <div class="ten-frame-15">
+        `;
+        for (let i = 0; i < 15; i++) {
             let content = '';
-            if (i < num1) content = '🔴';
-            else if (i < num1 + num2) content = '🔵';
-            gridHtml += `<div class="grid-cell">${content}</div>`;
+            if (i < num1) content = '👾'; 
+            else if (i < num1 + num2) content = '🤖'; 
+            htmlContent += `<div class="grid-cell">${content}</div>`;
         }
-        gridHtml += '</div>';
+        htmlContent += '</div>';
 
-        renderStage(gridHtml, generateOptions(answer));
+        renderStage(htmlContent, generateOptions(answer));
     }
 
-    // --- 遊戲 2：數字翹翹板 ---
+    // --- 遊戲 2：精準定位積木貼齊表面 ---
     function initGame2() {
-        const leftWeight = Math.floor(Math.random() * 4) + 3; // 3~6
-        const rightExist = Math.floor(Math.random() * (leftWeight - 1)) + 1; // 小於左邊
-        answer = leftWeight - rightExist;
+        const rightWeight = Math.floor(Math.random() * 4) + 3; 
+        const leftExist = Math.floor(Math.random() * (rightWeight - 1)) + 1; 
+        answer = rightWeight - leftExist; 
         
-        currentHint = `左邊有 ${leftWeight} 個積木，右邊只有 ${rightExist} 個。右邊還要放幾個，翹翹板才會平衡呢？`;
-        document.getElementById('hint-text').innerText = currentHint;
+        gameData = { targetRight: rightWeight, initialLeft: leftExist, currentAdded: 0, target: answer };
 
-        // 計算翹翹板傾斜角度 (模擬不平衡)
-        const angle = -10; 
+        updateHintDisplay(`左邊得 ${leftExist} 個禮物，右邊有 ${rightWeight} 個。請用上面嘅箭頭增減禮物，幫翹翹板變平衡啦！`);
 
-        let seesawHtml = `
-            <div class="seesaw-container">
-                <div class="seesaw-board" style="transform: rotate(${angle}deg)">
-                    <div class="weight-zone" id="left-zone"></div>
-                    <div class="weight-zone" id="right-zone"></div>
+        let htmlContent = `
+            <div class="formula-display" id="seesaw-formula">${leftExist} + 0 = ${rightWeight}</div>
+            
+            <div class="seesaw-layout-v2">
+                <div class="stepper-horizontal">
+                    <button class="stepper-btn btn-down" onclick="changeGift(-1)">▼</button>
+                    <div class="counter-display" id="gift-counter">0</div>
+                    <button class="stepper-btn btn-up" onclick="changeGift(1)">▲</button>
                 </div>
-                <div class="seesaw-base"></div>
+
+                <div class="seesaw-container-v2">
+                    <div class="seesaw-board" id="seesaw-board">
+                        <div class="weight-zone" id="left-zone"></div>
+                        <div class="weight-zone" id="right-zone"></div>
+                    </div>
+                    <div class="seesaw-base"></div>
+                </div>
             </div>
+            
+            <button class="submit-btn" onclick="checkSeesawAnswer()">好喇！檢查下！</button>
         `;
 
-        renderStage(seesawHtml, generateOptions(answer));
+        renderStage(htmlContent, ''); 
+        updateSeesawGraphics();
+    }
 
-        // 動態塞入積木
+    function changeGift(val) {
+        let newAdded = gameData.currentAdded + val;
+        if (newAdded < 0 || newAdded > 9) return; 
+        
+        gameData.currentAdded = newAdded;
+        document.getElementById('gift-counter').innerText = newAdded;
+        
+        if(val > 0) speak("加一個");
+        else speak("減一個");
+        
+        document.getElementById('seesaw-formula').innerText = `${gameData.initialLeft} + ${newAdded} = ${gameData.targetRight}`;
+        updateSeesawGraphics();
+    }
+
+    function updateSeesawGraphics() {
         const leftZone = document.getElementById('left-zone');
-        for(let i=0; i<leftWeight; i++) {
-            leftZone.innerHTML += '<div class="weight-block weight-red">🎁</div>';
-        }
         const rightZone = document.getElementById('right-zone');
-        for(let i=0; i<rightExist; i++) {
-            rightZone.innerHTML += '<div class="weight-block weight-blue">📦</div>';
+        
+        leftZone.innerHTML = '';
+        const totalLeftNow = gameData.initialLeft + gameData.currentAdded;
+        for(let i = 0; i < totalLeftNow; i++) {
+            if(i < gameData.initialLeft) {
+                leftZone.innerHTML += '<div class="weight-block weight-blue">📦</div>';
+            } else {
+                leftZone.innerHTML += '<div class="weight-block weight-blue" style="background:#10B981; border-color:#047857;">🎁</div>';
+            }
+        }
+        
+        rightZone.innerHTML = '';
+        for(let i = 0; i < gameData.targetRight; i++) {
+            rightZone.innerHTML += '<div class="weight-block weight-red">🎁</div>';
+        }
+
+        const currentDiff = totalLeftNow - gameData.targetRight;
+        let angle = currentDiff * 4; 
+        if (angle > 12) angle = 12;
+        if (angle < -12) angle = -12;
+        
+        document.getElementById('seesaw-board').style.transform = `rotate(${angle}deg)`;
+    }
+
+    function checkSeesawAnswer() {
+        if (gameData.currentAdded === gameData.target) {
+            speak("答對喇！兩邊平衡晒，你超級叻呀！");
+            document.getElementById('game-stage').classList.add('celebrate');
+            document.getElementById('seesaw-board').style.transform = 'rotate(0deg)';
+            document.getElementById('seesaw-formula').innerText = `${gameData.initialLeft} + ${gameData.currentAdded} = ${gameData.targetRight}`;
+            setTimeout(() => { switchGame(2); }, 2800);
+        } else {
+            const totalLeftNow = gameData.initialLeft + gameData.currentAdded;
+            if (totalLeftNow < gameData.targetRight) {
+                speak("唔啱喎，左邊好似仲輕咗少少，再加啲禮物試下？");
+            } else {
+                speak("唔啱喎，左邊好似重得滯喇，減返少少禮物試下？");
+            }
         }
     }
 
-    // --- 遊戲 3：餅乾不見了 ---
+    // --- 遊戲 3 ---
     function initGame3() {
-        const totalCookies = Math.floor(Math.random() * 4) + 4; // 4~7
-        const eatCount = Math.floor(Math.random() * 3) + 1; // 1~3
+        const totalCookies = Math.floor(Math.random() * 4) + 4; 
+        const eatCount = Math.floor(Math.random() * 3) + 1; 
         answer = totalCookies - eatCount;
-        gameData = { remainingToEat: eatCount, total: totalCookies };
+        gameData = { remainingToEat: eatCount, total: totalCookies, eatenSoFar: 0 };
 
-        currentHint = `盤子裡原本有 ${totalCookies} 片餅乾。請用手指幫小狗點擊並吃掉 ${eatCount} 片餅乾！`;
-        document.getElementById('hint-text').innerText = currentHint;
+        updateHintDisplay(`碟入面原本有 ${totalCookies} 塊餅乾。請幫小狗食咗 ${eatCount} 塊餅乾佢！`);
 
-        let cookieHtml = '<div class="cookie-jar">';
+        let htmlContent = `
+            <div class="formula-display" id="math-formula" style="visibility: hidden;"></div>
+            <div class="cookie-jar">
+        `;
         for (let i = 0; i < totalCookies; i++) {
-            cookieHtml += `<div class="cookie" onclick="eatCookie(this)"></div>`;
+            htmlContent += `<div class="cookie" onclick="eatCookie(this)"></div>`;
         }
-        cookieHtml += '</div>';
+        htmlContent += '</div>';
 
-        // 這一關等孩子吃完餅乾後，才核對剩下多少，因此先隱藏或不點擊答案按鈕
-        renderStage(cookieHtml, `<div style="font-size:1.2rem; color:#666;">請先在畫面上吃掉 ${eatCount} 片餅乾</div>`);
+        renderStage(htmlContent, `<div id="status-txt" style="font-size:1.3rem; color:#FF6B6B; font-weight:bold; margin-top:20px;">幫小狗點擊食餅乾 🐶</div>`);
     }
 
     function eatCookie(element) {
@@ -364,14 +556,18 @@
         
         element.classList.add('eaten');
         gameData.remainingToEat--;
-        speak("好充（Munch!）");
+        gameData.eatenSoFar++;
+        speak("好食！");
 
         if (gameData.remainingToEat === 0) {
-            currentHint = `太棒了！那現在盤子裡還剩下幾片餅乾呢？看一看，選個數字吧！`;
-            document.getElementById('hint-text').innerText = currentHint;
+            updateHintDisplay(`太棒啦！依家碟入面仲剩低幾多塊餅乾呢？選個數字啦！`);
             speak(currentHint);
             
-            // 顯示數字按鈕讓孩子回答
+            const formulaDiv = document.getElementById('math-formula');
+            formulaDiv.innerText = `${gameData.total} - ${gameData.eatenSoFar} = `;
+            formulaDiv.style.visibility = 'visible';
+            
+            document.getElementById('status-txt').style.display = 'none';
             renderOptionsZone(generateOptions(answer));
         }
     }
@@ -381,7 +577,7 @@
         let opts = new Set([correct]);
         while(opts.size < 3) {
             let wrong = correct + (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * 2) + 1);
-            if (wrong >= 1 && wrong <= 10) opts.add(wrong);
+            if (wrong >= 0 && wrong <= 15) opts.add(wrong);
         }
         return Array.from(opts).sort((a, b) => a - b);
     }
@@ -407,32 +603,23 @@
 
     function checkAnswer(selected) {
         if (selected === answer) {
-            speak("答對了！你太棒了！");
+            speak("答對喇！你超級叻呀！");
             document.getElementById('game-stage').classList.add('celebrate');
             
-            // 遊戲2的特殊效果：答對時翹翹板變平衡
-            if (currentGame === 2) {
-                document.querySelector('.seesaw-board').style.transform = 'rotate(0deg)';
-                const rightZone = document.getElementById('right-zone');
-                rightZone.innerHTML = ''; // 補滿右邊視覺
-                for(let i=0; i< (gameData.left || answer + 1); i++) { // 快速補齊動畫
-                     rightZone.innerHTML += '<div class="weight-block weight-blue">📦</div>';
-                }
+            if (currentGame === 1) {
+                document.getElementById('plus-formula').innerText = `${gameData.num1} + ${gameData.num2} = ${selected}`;
+            }
+            if (currentGame === 3) {
+                document.getElementById('math-formula').innerText = `${gameData.total} - ${gameData.eatenSoFar} = ${selected}`;
             }
 
-            // 2秒後自動換下一題
-            setTimeout(() => {
-                switchGame(currentGame);
-            }, 2500);
+            setTimeout(() => { switchGame(currentGame); }, 2800);
         } else {
-            speak("喔喔，再數一次看看唷！");
+            speak("唔啱，再數多次睇下？");
         }
     }
 
-    // 啟動首頁
-    window.onload = () => {
-        switchGame(1);
-    };
+    window.onload = () => { switchGame(1); };
 </script>
 </body>
 </html>
