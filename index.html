@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>小動物數學派對 - V21 炫彩碎紙慶祝版</title>
+    <title>小動物數學派對 - V22 小兔食紅蘿蔔版</title>
     <style>
         :root {
             --primary: #FF6B6B;
@@ -70,9 +70,9 @@
             justify-content: flex-start;
             padding: 15px;
             margin-bottom: 10px;
-            overflow: hidden; /* 確保內部元件不溢出 */
+            overflow: hidden;
         }
-        /* 碎紙畫布：疊加在舞台最上方，但不阻擋點擊 */
+        /* 碎紙畫布 */
         #confetti-canvas {
             position: absolute;
             top: 0;
@@ -204,7 +204,7 @@
             text-align: center;
         }
         
-        /* 天秤主容器壓縮高度並上移 */
+        /* 天秤主容器 */
         .seesaw-container-v2 {
             position: relative;
             width: 100%;
@@ -214,8 +214,6 @@
             align-items: flex-end;
             margin-bottom: 10px;
         }
-        
-        /* 木板定位與旋轉點 */
         .seesaw-board {
             width: 90%;
             height: 16px;
@@ -227,8 +225,6 @@
             transition: transform 0.5s ease-in-out;
             z-index: 2;
         }
-        
-        /* 三角形支撐底座 */
         .seesaw-base {
             position: absolute;
             bottom: 0;
@@ -240,8 +236,6 @@
             border-bottom: 35px solid #4A5759;
             z-index: 1;
         }
-        
-        /* 天秤放置區排版 */
         .weight-zone {
             position: absolute;
             bottom: 16px; 
@@ -251,23 +245,9 @@
             align-items: flex-end; 
             gap: 5px;
         }
-        #left-zone { 
-            left: 15px; 
-            flex-direction: row; 
-        }
-        #right-zone { 
-            right: 15px; 
-            flex-direction: row-reverse; 
-        }
-        
-        /* 垂直積木直行柱子 */
-        .weight-column {
-            display: flex;
-            flex-direction: column-reverse; 
-            gap: 2px;
-        }
-        
-        /* 積木尺寸微調 */
+        #left-zone { left: 15px; flex-direction: row; }
+        #right-zone { right: 15px; flex-direction: row-reverse; }
+        .weight-column { display: flex; flex-direction: column-reverse; gap: 2px; }
         .weight-block {
             width: 36px; 
             height: 36px; 
@@ -282,7 +262,6 @@
         .weight-blue { background: var(--secondary); border: 2px solid #37A19A; }
         .weight-green { background: #10B981; border: 2px solid #047857; }
         
-        /* 確保檢查按鈕安全收進框內 */
         .submit-btn {
             background: #1A73E8;
             color: white;
@@ -302,7 +281,7 @@
             box-shadow: 0 2px 0 #0D47A1;
         }
 
-        /* 遊戲 3 & 4：餅乾盤 */
+        /* 項目容器（餅乾盤/紅蘿蔔田） */
         .cookie-jar {
             display: flex;
             flex-wrap: wrap;
@@ -311,6 +290,8 @@
             max-width: 450px;
             margin-top: 15px;
         }
+
+        /* 遊戲 3：傳統圓形餅乾 */
         .cookie {
             width: 70px;
             height: 70px;
@@ -337,7 +318,53 @@
             transform: scale(0);
             transition: all 0.3s ease;
         }
-        .cookie.crossed::after {
+
+        /* 🥕 遊戲 4 特屬：全新 CSS 紅蘿蔔外觀設計 */
+        .carrot {
+            width: 45px;
+            height: 75px;
+            background: #FF8833; /* 亮橘色蘿蔔身 */
+            border: 3px solid #E05500;
+            border-radius: 50% 50% 50% 50% / 20% 20% 80% 80%; /* 上圓下尖的蘿蔔形狀 */
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 0 #D05000;
+            margin-top: 15px; /* 給葉子留點空間 */
+        }
+        /* 紅蘿蔔上方的綠色嫩葉 */
+        .carrot::before {
+            content: '';
+            position: absolute;
+            top: -18px;
+            left: calc(50% - 8px);
+            width: 16px;
+            height: 16px;
+            background: #2ECC71;
+            border: 2px solid #27AE60;
+            border-radius: 80% 0 80% 0; /* 葉子形狀 */
+            transform: rotate(-45deg);
+        }
+        /* 紅蘿蔔身上的橫紋橫線 */
+        .carrot-stripes {
+            position: absolute;
+            width: 60%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            pointer-events: none;
+        }
+        .carrot-stripes::after {
+            content: '';
+            border-top: 2px dashed rgba(224, 85, 0, 0.6);
+            height: 50%;
+        }
+
+        /* 交叉（❌）標記：通用於餅乾與紅蘿蔔 */
+        .crossed::after {
             content: '❌';
             position: absolute;
             font-size: 2.2rem;
@@ -347,6 +374,7 @@
             width: 100%;
             height: 100%;
             animation: bounceIn 0.2s;
+            z-index: 3;
         }
 
         /* 答案按鈕區 */
@@ -394,7 +422,7 @@
         <button class="nav-btn active" onclick="switchGame(1)">1. 15內小怪獸</button>
         <button class="nav-btn" onclick="switchGame(2)">2. 10內翹翹板</button>
         <button class="nav-btn" onclick="switchGame(3)">3. 10內食餅乾</button>
-        <button class="nav-btn" onclick="switchGame(4)">4. 狗狗減法填空</button>
+        <button class="nav-btn" onclick="switchGame(4)">4. 小兔減法填空</button>
     </div>
 
     <div id="game-stage">
@@ -421,8 +449,10 @@
     function initConfettiCanvas() {
         const canvas = document.getElementById('confetti-canvas');
         const stage = document.getElementById('game-stage');
-        canvas.width = stage.clientWidth;
-        canvas.height = stage.clientHeight;
+        if(canvas) {
+            canvas.width = stage.clientWidth;
+            canvas.height = stage.clientHeight;
+        }
     }
 
     function startConfetti() {
@@ -431,11 +461,10 @@
         const ctx = canvas.getContext('2d');
         confettiParticles = [];
 
-        // 隨機產生 120 顆彩色碎紙屑
         for (let i = 0; i < 120; i++) {
             confettiParticles.push({
                 x: Math.random() * canvas.width,
-                y: Math.random() * -canvas.height - 20, // 從畫布上方外圍掉落
+                y: Math.random() * -canvas.height - 20,
                 size: Math.random() * 8 + 6,
                 color: confettiColors[Math.floor(Math.random() * confettiColors.length)],
                 speedX: Math.random() * 4 - 2,
@@ -456,7 +485,6 @@
                 p.x += p.speedX;
                 p.rotation += p.rotationSpeed;
 
-                // 如果碎紙屑還在舞台內，就畫出來
                 if (p.y < canvas.height) {
                     hasActiveParticles = true;
                     ctx.save();
@@ -488,7 +516,6 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
     }
-    // --- 特效引擎結束 ---
 
     function toggleMute() {
         isMuted = !isMuted;
@@ -504,7 +531,6 @@
         }
     }
 
-    // 語音引擎
     function speak(text) {
         if (isMuted) return;
         window.speechSynthesis.cancel();
@@ -514,7 +540,6 @@
         window.speechSynthesis.speak(utterance);
     }
 
-    // 生成垂直積木直行柱
     function renderVerticalBlocks(count, type, initialCount = 0) {
         let html = '';
         let currentBlocks = [];
@@ -553,7 +578,7 @@
     }
 
     function switchGame(gameNum) {
-        stopConfetti(); // 切換或重置遊戲時清除過關碎紙
+        stopConfetti();
         currentGame = gameNum;
         document.querySelectorAll('.nav-btn').forEach((btn, idx) => {
             btn.classList.toggle('active', idx + 1 === gameNum);
@@ -592,7 +617,7 @@
         renderStage(htmlContent, generateOptions(answer));
     }
 
-    // --- 遊戲 2：數字翹翹板 ---
+    // --- 遊戲 2 ---
     function initGame2() {
         const rightWeight = Math.floor(Math.random() * 6) + 5; 
         const leftExist = Math.floor(Math.random() * (rightWeight - 2)) + 1; 
@@ -689,7 +714,7 @@
             updateHintDisplay(`好棒！${gameData.initialLeft} + ( ${selectedNum} ) = ${gameData.targetRight}`);
             speak(`冇錯喇！${gameData.initialLeft} 加 ${selectedNum} 就等於 ${gameData.targetRight} 喇！你超級聰明！`);
             document.getElementById('game-stage').classList.add('celebrate');
-            startConfetti(); // 🎉 觸發五彩碎紙動畫
+            startConfetti();
             setTimeout(() => { switchGame(2); }, 5000);
         } else {
             speak("唔啱喎，數下左邊有幾個綠色禮物？再揀多次！");
@@ -737,7 +762,7 @@
         }
     }
 
-    // --- 遊戲 4 ---
+    // --- 🥕 遊戲 4：小兔吃紅蘿蔔（全新改版） ---
     function initGame4() {
         const total = Math.floor(Math.random() * 5) + 5; 
         const remaining = Math.floor(Math.random() * 3) + 2; 
@@ -750,49 +775,54 @@
             currentXCount: 0 
         };
 
-        updateHintDisplay(`一開始有 ${total} 塊餅乾，最後要剩返 ${remaining} 塊。一齊幫要食掉嘅餅乾打交叉（❌）啦！`);
+        // 提示語音與文本調整為小兔與紅蘿蔔
+        updateHintDisplay(`原本有 ${total} 條紅蘿蔔，最後要剩返 ${remaining} 條。一齊幫要被小兔食掉嘅紅蘿蔔打交叉（❌）啦！`);
 
         let htmlContent = `
             <div class="formula-display" id="game4-formula">${total} - ( ❓ ) = ${remaining}</div>
             <div class="cookie-jar">
         `;
         for (let i = 0; i < total; i++) {
-            htmlContent += `<div class="cookie" onclick="toggleCookieX(this)"></div>`;
+            // 使用全新的 carrot 樣式與橫紋元件
+            htmlContent += `
+                <div class="carrot" onclick="toggleCarrotX(this)">
+                    <div class="carrot-stripes"></div>
+                </div>`;
         }
         htmlContent += '</div>';
 
         renderStage(htmlContent, `
             <div id="game4-status" style="font-size:1.2rem; color:#1A73E8; font-weight:bold; margin-top:10px; display:flex; flex-direction:column; align-items:center; gap:10px;">
-                <span>點擊餅乾打交叉（❌）代表被食掉</span>
-                <button class="submit-btn" id="game4-submit" onclick="checkGame4Cookies()">好喇！檢查下！</button>
+                <span>點擊紅蘿蔔打交叉（❌）代表被小兔食掉 🐰</span>
+                <button class="submit-btn" id="game4-submit" onclick="checkGame4Carrots()">好喇！檢查下！</button>
             </div>
         `);
     }
 
-    function toggleCookieX(element) {
+    function toggleCarrotX(element) {
         if (element.classList.contains('crossed')) {
             element.classList.remove('crossed');
             gameData.currentXCount--;
-            speak("攞返出嚟");
+            speak("擺返好");
         } else {
             element.classList.add('crossed');
             gameData.currentXCount++;
-            speak("食一塊");
+            speak("食一條");
         }
     }
 
-    function checkGame4Cookies() {
+    function checkGame4Carrots() {
         if (gameData.currentXCount === gameData.targetAnswer) {
-            speak("冇錯喇！你睇下，打咗交叉嘅代表被食掉。依家請揀答案，填入空格入面啦！");
+            speak("冇錯喇！你睇下，打咗交叉嘅代表被小兔食咗。依家請揀答案，填入空格入面啦！");
             document.getElementById('game4-status').style.display = 'none';
             updateHintDisplay(`咁 ${gameData.total} 減幾多會等於 ${gameData.remaining} 呀？請揀個數字填落去啦！`);
             renderOptionsZone(generateOptions(gameData.targetAnswer));
         } else {
             const currentRemaining = gameData.total - gameData.currentXCount;
             if (currentRemaining > gameData.remaining) {
-                speak(`唔啱喎，依家仲有 ${currentRemaining} 塊冇打交叉，剩得太多喇，再食多啲啦！`);
+                speak(`唔啱喎，依家鋪頭仲有 ${currentRemaining} 條紅蘿蔔，剩得太多喇，再餵小兔食多啲啦！`);
             } else {
-                speak(`唔啱喎，依家得返 ${currentRemaining} 塊冇打交叉，食得太多喇，點多一下攞返出嚟試下？`);
+                speak(`唔啱喎，依家得返 ${currentRemaining} 條紅蘿蔔，食得太多喇，點多一下攞返出嚟試下？`);
             }
         }
     }
@@ -801,12 +831,12 @@
         if (selectedNum === gameData.targetAnswer) {
             document.getElementById('game4-formula').innerText = `${gameData.total} - ( ${selectedNum} ) = ${gameData.remaining}`;
             updateHintDisplay(`太棒啦！${gameData.total} - ( ${selectedNum} ) = ${gameData.remaining}`);
-            speak(`好厲害呀！${gameData.total} 塊餅乾，食咗 ${selectedNum} 塊，就真係剩返 ${gameData.remaining} 塊喇！`);
+            speak(`好厲害呀！${gameData.total} 條紅蘿蔔，小兔食咗 ${selectedNum} 條，就真係剩返 ${gameData.remaining} 條喇！`);
             document.getElementById('game-stage').classList.add('celebrate');
-            startConfetti(); // 🎉 觸發五彩碎紙動畫
-            setTimeout(() => { switchGame(4); }, 5550);
+            startConfetti();
+            setTimeout(() => { switchGame(4); }, 5500);
         } else {
-            speak(`唔啱喎，數下有幾多塊餅乾打咗紅色交叉（❌）？再揀多次！`);
+            speak(`唔啱喎，數下有幾多條紅蘿蔔打咗紅色交叉（❌）？再揀多次！`);
         }
     }
 
@@ -822,8 +852,6 @@
 
     function renderStage(contentHtml, optionsArrayOrHtml) {
         const stage = document.getElementById('game-stage');
-        
-        // 為了不覆蓋畫布，每次保留畫布元素，只更新其餘內容
         let canvasHtml = '<canvas id="confetti-canvas"></canvas>';
         stage.innerHTML = canvasHtml + contentHtml + '<div class="options-zone" id="opt-zone"></div>';
         
@@ -832,7 +860,7 @@
         } else {
             document.getElementById('opt-zone').innerHTML = optionsArrayOrHtml;
         }
-        initConfettiCanvas(); // 每次重組舞台都重新計算一次畫布寬高
+        initConfettiCanvas();
     }
 
     function renderOptionsZone(optionsArray) {
@@ -853,7 +881,7 @@
         if (selected === answer) {
             speak("答對喇！你超級叻呀！");
             document.getElementById('game-stage').classList.add('celebrate');
-            startConfetti(); // 🎉 觸發五彩碎紙動畫
+            startConfetti();
 
             if (currentGame === 1) {
                 document.getElementById('plus-formula').innerText = `${gameData.num1} + ${gameData.num2} = ${selected}`;
@@ -868,7 +896,7 @@
     }
 
     window.onload = () => { switchGame(1); };
-    window.onresize = () => { initConfettiCanvas(); }; // 視窗縮放時自適應
+    window.onresize = () => { initConfettiCanvas(); };
 </script>
 </body>
 </html>
