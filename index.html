@@ -1,436 +1,494 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>小動物數學派對 - V11 物理修正版</title>
-  <style>
-    :root {
-      --primary: #FF6B6B;
-      --secondary: #4ECDC4;
-      --accent: #FFE66D;
-      --bg: #F7FFF7;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>小動物數學派對 - V21 炫彩碎紙慶祝版</title>
+    <style>
+        :root {
+            --primary: #FF6B6B;
+            --secondary: #4ECDC4;
+            --accent: #FFE66D;
+            --bg: #F7FFF7;
+        }
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'PingFang HK', sans-serif;
+            background-color: var(--bg);
+            color: #2F3E46;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        /* 主選單 */
+        #nav-menu {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            z-index: 10;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .nav-btn {
+            background-color: white;
+            border: 4px solid var(--secondary);
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 0 var(--secondary);
+            transition: all 0.1s;
+        }
+        .nav-btn.active {
+            background-color: var(--accent);
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 var(--secondary);
+        }
+        /* 遊戲舞台 */
+        #game-stage {
+            width: 94vw;
+            height: 74vh;
+            max-width: 820px;
+            background: white;
+            border: 8px solid #4A5759;
+            border-radius: 30px;
+            position: relative;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 15px;
+            margin-bottom: 10px;
+            overflow: hidden; /* 確保內部元件不溢出 */
+        }
+        /* 碎紙畫布：疊加在舞台最上方，但不阻擋點擊 */
+        #confetti-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 99;
+        }
+        /* 語音提示條 */
+        #audio-hint-bar {
+            background: var(--accent);
+            padding: 8px 18px;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: 3px solid #2F3E46;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 94vw;
+            max-width: 820px;
+            z-index: 10;
+        }
+        #mute-btn {
+            cursor: pointer;
+            font-size: 1.5rem;
+            padding: 2px 8px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.5);
+        }
+        #hint-text {
+            cursor: pointer;
+            flex-grow: 1;
+        }
+        /* 算式顯示區 */
+        .formula-display {
+            font-size: 2.6rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #1A73E8;
+            background: #E8F0FE;
+            padding: 6px 20px;
+            border-radius: 20px;
+            letter-spacing: 3px;
+            min-height: 55px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+        /* 遊戲 1：十五格陣小怪獸 */
+        .ten-frame-15 {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 10px;
+            width: 85%;
+            max-width: 450px;
+            background: #E8F0FE;
+            padding: 12px;
+            border-radius: 20px;
+            border: 5px dashed #1A73E8;
+            margin-top: 10px;
+        }
+        .grid-cell {
+            aspect-ratio: 1;
+            background: white;
+            border: 3px solid #B0CBD6;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.3rem;
+        }
+        /* 遊戲 2：天秤結構 */
+        .seesaw-layout-v2 {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            flex-grow: 1;
+        }
+        .control-zone {
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 5px;
+        }
+        .stepper-horizontal {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 20px;
+            background: #F0F4F8;
+            padding: 4px 15px;
+            border-radius: 15px;
+            border: 3px solid #CBD5E1;
+        }
+        .stepper-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 0 rgba(0,0,0,0.2);
+        }
+        .btn-up { background: #34D399; box-shadow: 0 3px 0 #059669; }
+        .btn-up:active { transform: translateY(2px); box-shadow: 0 1px 0 #059669; }
+        .btn-down { background: #F87171; box-shadow: 0 3px 0 #DC2626; }
+        .btn-down:active { transform: translateY(2px); box-shadow: 0 1px 0 #DC2626; }
+        
+        .counter-display {
+            font-size: 1.2rem;
+            font-weight: bold;
+            background: white;
+            padding: 2px 10px;
+            border-radius: 8px;
+            border: 2px solid #94A3B8;
+            min-width: 45px;
+            text-align: center;
+        }
+        
+        /* 天秤主容器壓縮高度並上移 */
+        .seesaw-container-v2 {
+            position: relative;
+            width: 100%;
+            height: 210px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            margin-bottom: 10px;
+        }
+        
+        /* 木板定位與旋轉點 */
+        .seesaw-board {
+            width: 90%;
+            height: 16px;
+            background: #8B5A2B;
+            border-radius: 10px;
+            position: absolute;
+            bottom: 35px;
+            transform-origin: center center;
+            transition: transform 0.5s ease-in-out;
+            z-index: 2;
+        }
+        
+        /* 三角形支撐底座 */
+        .seesaw-base {
+            position: absolute;
+            bottom: 0;
+            left: calc(50% - 18px);
+            width: 0;
+            height: 0;
+            border-left: 18px solid transparent;
+            border-right: 18px solid transparent;
+            border-bottom: 35px solid #4A5759;
+            z-index: 1;
+        }
+        
+        /* 天秤放置區排版 */
+        .weight-zone {
+            position: absolute;
+            bottom: 16px; 
+            height: 180px; 
+            display: flex;
+            flex-direction: row; 
+            align-items: flex-end; 
+            gap: 5px;
+        }
+        #left-zone { 
+            left: 15px; 
+            flex-direction: row; 
+        }
+        #right-zone { 
+            right: 15px; 
+            flex-direction: row-reverse; 
+        }
+        
+        /* 垂直積木直行柱子 */
+        .weight-column {
+            display: flex;
+            flex-direction: column-reverse; 
+            gap: 2px;
+        }
+        
+        /* 積木尺寸微調 */
+        .weight-block {
+            width: 36px; 
+            height: 36px; 
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem; 
+            animation: bounceIn 0.2s;
+        }
+        .weight-red { background: var(--primary); border: 2px solid #C84B4B; }
+        .weight-blue { background: var(--secondary); border: 2px solid #37A19A; }
+        .weight-green { background: #10B981; border: 2px solid #047857; }
+        
+        /* 確保檢查按鈕安全收進框內 */
+        .submit-btn {
+            background: #1A73E8;
+            color: white;
+            font-size: 1.3rem;
+            font-weight: bold;
+            padding: 8px 35px;
+            border-radius: 22px;
+            border: none;
+            box-shadow: 0 4px 0 #0D47A1;
+            cursor: pointer;
+            margin-top: auto;
+            margin-bottom: 5px;
+            z-index: 5;
+        }
+        .submit-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #0D47A1;
+        }
 
-    * {
-      box-sizing: border-box;
-      user-select: none;
-      -webkit-user-select: none;
-    }
+        /* 遊戲 3 & 4：餅乾盤 */
+        .cookie-jar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            max-width: 450px;
+            margin-top: 15px;
+        }
+        .cookie {
+            width: 70px;
+            height: 70px;
+            background: #D2B48C;
+            border: 4px solid #8B5A2B;
+            border-radius: 50%;
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: 0 4px 0 #8B5A2B;
+        }
+        .cookie::before {
+            content: '• •\n• •';
+            color: #4A2711;
+            font-size: 0.9rem;
+            position: absolute;
+        }
+        .cookie.eaten {
+            visibility: hidden;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.3s ease;
+        }
+        .cookie.crossed::after {
+            content: '❌';
+            position: absolute;
+            font-size: 2.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            animation: bounceIn 0.2s;
+        }
 
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Comic Sans MS', 'Chalkboard SE', 'PingFang HK', sans-serif;
-      background-color: var(--bg);
-      color: #2F3E46;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-    }
+        /* 答案按鈕區 */
+        .options-zone {
+            margin-top: auto;
+            display: flex;
+            gap: 15px;
+            width: 100%;
+            justify-content: center;
+            padding-bottom: 5px;
+        }
+        .option-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: white;
+            border: 5px solid var(--primary);
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 0 var(--primary);
+        }
+        .option-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 var(--primary);
+        }
 
-    /* 主選單 */
-    #nav-menu {
-      display: flex;
-      gap: 15px;
-      margin-bottom: 10px;
-      z-index: 10;
-    }
-
-    .nav-btn {
-      background-color: white;
-      border: 4px solid var(--secondary);
-      border-radius: 20px;
-      padding: 8px 18px;
-      font-size: 1.1rem;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 0 5px 0 var(--secondary);
-      transition: all 0.1s;
-    }
-
-    .nav-btn.active {
-      background-color: var(--accent);
-      transform: translateY(4px);
-      box-shadow: 0 1px 0 var(--secondary);
-    }
-
-    /* 遊戲舞台 */
-    #game-stage {
-      width: 94vw;
-      height: 74vh;
-      max-width: 820px;
-      background: white;
-      border: 8px solid #4A5759;
-      border-radius: 30px;
-      position: relative;
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      padding: 15px;
-    }
-
-    /* 語音提示條 */
-    #audio-hint-bar {
-      background: var(--accent);
-      padding: 8px 18px;
-      border-radius: 15px;
-      font-size: 1.2rem;
-      font-weight: bold;
-      margin-bottom: 10px;
-      border: 3px solid #2F3E46;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      width: 100%;
-    }
-
-    #mute-btn {
-      cursor: pointer;
-      font-size: 1.5rem;
-      padding: 2px 8px;
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.5);
-    }
-
-    #hint-text {
-      cursor: pointer;
-      flex-grow: 1;
-    }
-
-    /* 算式顯示區 */
-    .formula-display {
-      font-size: 2.6rem;
-      font-weight: bold;
-      margin-bottom: 10px;
-      color: #1A73E8;
-      background: #E8F0FE;
-      padding: 6px 20px;
-      border-radius: 20px;
-      letter-spacing: 3px;
-      min-height: 55px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-    }
-
-    /* 遊戲 1：十五格陣小怪獸 */
-    .ten-frame-15 {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      grid-template-rows: repeat(3, 1fr);
-      gap: 10px;
-      width: 85%;
-      max-width: 450px;
-      background: #E8F0FE;
-      padding: 12px;
-      border-radius: 20px;
-      border: 5px dashed #1A73E8;
-      margin-top: 10px;
-    }
-
-    .grid-cell {
-      aspect-ratio: 1;
-      background: white;
-      border: 3px solid #B0CBD6;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.3rem;
-    }
-
-    /* 遊戲 2：天秤結構 */
-    .seesaw-layout-v2 {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      flex-grow: 1;
-    }
-
-    /* 橫向的按鈕計數器 */
-    .stepper-horizontal {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      gap: 20px;
-      background: #F0F4F8;
-      padding: 8px 20px;
-      border-radius: 20px;
-      border: 3px solid #CBD5E1;
-      margin-bottom: 5px;
-    }
-
-    .stepper-btn {
-      width: 55px;
-      height: 55px;
-      border-radius: 15px;
-      font-size: 1.8rem;
-      font-weight: bold;
-      color: white;
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
-    }
-
-    .btn-up {
-      background: #34D399;
-      box-shadow: 0 4px 0 #059669;
-    }
-
-    .btn-up:active {
-      transform: translateY(2px);
-      box-shadow: 0 2px 0 #059669;
-    }
-
-    .btn-down {
-      background: #F87171;
-      box-shadow: 0 4px 0 #DC2626;
-    }
-
-    .btn-down:active {
-      transform: translateY(2px);
-      box-shadow: 0 2px 0 #DC2626;
-    }
-
-    .counter-display {
-      font-size: 1.5rem;
-      font-weight: bold;
-      background: white;
-      padding: 5px 15px;
-      border-radius: 10px;
-      border: 2px solid #94A3B8;
-      min-width: 60px;
-      text-align: center;
-    }
-
-    /* 天秤主容器 */
-    .seesaw-container-v2 {
-      position: relative;
-      width: 100%;
-      height: 180px;
-      display: flex;
-      justify-content: center;
-      align-items: flex-end;
-      margin-top: 5px;
-    }
-
-    .seesaw-board {
-      width: 85%;
-      height: 16px;
-      background: #8B5A2B;
-      border-radius: 10px;
-      position: relative;
-      transform-origin: center bottom;
-      transition: transform 0.5s ease-in-out;
-      z-index: 2;
-    }
-
-    .seesaw-base {
-      position: absolute;
-      bottom: 0;
-      width: 0;
-      height: 0;
-      border-left: 15px solid transparent;
-      border-right: 15px solid transparent;
-      border-bottom: 35px solid #4A5759;
-      z-index: 1;
-    }
-
-    /* 放置區固定貼齊木板表面 */
-    .weight-zone {
-      position: absolute;
-      bottom: 16px;
-      display: flex;
-      flex-direction: column-reverse;
-      align-items: center;
-      width: 60px;
-    }
-
-    #left-zone {
-      left: 35px;
-    }
-
-    #right-zone {
-      right: 35px;
-    }
-
-    /* 幼兒大禮物樣式 */
-    .weight-block {
-      width: 52px;
-      height: 52px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.8rem;
-      margin-bottom: 3px;
-      animation: bounceIn 0.2s;
-    }
-
-    .weight-red {
-      background: var(--primary);
-      border: 3px solid #C84B4B;
-    }
-
-    .weight-blue {
-      background: var(--secondary);
-      border: 3px solid #37A19A;
-    }
-
-    /* 確定檢查按鈕 */
-    .submit-btn {
-      background: #1A73E8;
-      color: white;
-      font-size: 1.4rem;
-      font-weight: bold;
-      padding: 10px 40px;
-      border-radius: 25px;
-      border: none;
-      box-shadow: 0 4px 0 #0D47A1;
-      cursor: pointer;
-      margin-top: auto;
-      margin-bottom: 5px;
-      z-index: 5;
-    }
-
-    .submit-btn:active {
-      transform: translateY(2px);
-      box-shadow: 0 2px 0 #0D47A1;
-    }
-
-    /* 遊戲 3：動態減法與餅乾 */
-    .cookie-jar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
-      justify-content: center;
-      max-width: 450px;
-      margin-top: 15px;
-    }
-
-    .cookie {
-      width: 70px;
-      height: 70px;
-      background: #D2B48C;
-      border: 4px solid #8B5A2B;
-      border-radius: 50%;
-      position: relative;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.8rem;
-      box-shadow: 0 4px 0 #8B5A2B;
-    }
-
-    .cookie::before {
-      content: '• •\n• •';
-      color: #4A2711;
-      font-size: 0.9rem;
-      position: absolute;
-    }
-
-    .cookie.eaten {
-      visibility: hidden;
-      opacity: 0;
-      transform: scale(0);
-      transition: all 0.3s ease;
-    }
-
-    /* 答案按鈕區 */
-    .options-zone {
-      margin-top: auto;
-      display: flex;
-      gap: 15px;
-      width: 100%;
-      justify-content: center;
-      padding-bottom: 5px;
-    }
-
-    .option-btn {
-      width: 70px;
-      height: 70px;
-      border-radius: 50%;
-      background: white;
-      border: 5px solid var(--primary);
-      font-size: 2rem;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 0 5px 0 var(--primary);
-    }
-
-    .option-btn:active {
-      transform: translateY(3px);
-      box-shadow: 0 2px 0 var(--primary);
-    }
-
-    @keyframes bounceIn {
-      0% {
-        transform: scale(0.3);
-        opacity: 0;
-      }
-
-      50% {
-        transform: scale(1.1);
-      }
-
-      100% {
-        transform: scale(1);
-        opacity: 1;
-      }
-    }
-
-    .celebrate {
-      animation: win 0.5s ease-in-out infinite alternate;
-    }
-
-    @keyframes win {
-      from {
-        transform: scale(1);
-      }
-
-      to {
-        transform: scale(1.02);
-        background-color: #FFF9E6;
-      }
-    }
-  </style>
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .celebrate {
+            animation: win 0.5s ease-in-out infinite alternate;
+        }
+        @keyframes win {
+            from { transform: scale(1); }
+            to { transform: scale(1.02); background-color: #FFF9E6; }
+        }
+    </style>
 </head>
-
 <body>
 
-  <div id="nav-menu">
-    <button class="nav-btn active" onclick="switchGame(1)">1. 15內小怪獸</button>
-    <button class="nav-btn" onclick="switchGame(2)">2. 數字翹翹板</button>
-    <button class="nav-btn" onclick="switchGame(3)">3. 餅乾不見了</button>
-  </div>
+    <div id="nav-menu">
+        <button class="nav-btn active" onclick="switchGame(1)">1. 15內小怪獸</button>
+        <button class="nav-btn" onclick="switchGame(2)">2. 10內翹翹板</button>
+        <button class="nav-btn" onclick="switchGame(3)">3. 10內食餅乾</button>
+        <button class="nav-btn" onclick="switchGame(4)">4. 狗狗減法填空</button>
+    </div>
 
-  <div id="audio-hint-bar">
-    <span id="mute-btn" onclick="toggleMute()">🔊</span>
-    <span id="hint-text" onclick="speakHint()">點選上方按鈕開始玩啦！</span>
-  </div>
+    <div id="game-stage">
+        <canvas id="confetti-canvas"></canvas>
+    </div>
 
-  <div id="game-stage"></div>
+    <div id="audio-hint-bar">
+        <span id="mute-btn" onclick="toggleMute()">🔊</span>
+        <span id="hint-text" onclick="speakHint()">點選上方按鈕開始玩啦！</span>
+    </div>
 
-  <script>
+<script>
     let currentGame = 1;
     let answer = 0;
     let currentHint = "";
     let gameData = {};
     let isMuted = false;
+
+    // --- 🎮 原生 Canvas 五彩碎紙慶祝特效引擎 🎮 ---
+    let confettiAnimationId = null;
+    let confettiParticles = [];
+    const confettiColors = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#1A73E8', '#FF9F43', '#10B981', '#A855F7'];
+
+    function initConfettiCanvas() {
+        const canvas = document.getElementById('confetti-canvas');
+        const stage = document.getElementById('game-stage');
+        canvas.width = stage.clientWidth;
+        canvas.height = stage.clientHeight;
+    }
+
+    function startConfetti() {
+        initConfettiCanvas();
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        confettiParticles = [];
+
+        // 隨機產生 120 顆彩色碎紙屑
+        for (let i = 0; i < 120; i++) {
+            confettiParticles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * -canvas.height - 20, // 從畫布上方外圍掉落
+                size: Math.random() * 8 + 6,
+                color: confettiColors[Math.floor(Math.random() * confettiColors.length)],
+                speedX: Math.random() * 4 - 2,
+                speedY: Math.random() * 5 + 4,
+                rotation: Math.random() * 360,
+                rotationSpeed: Math.random() * 4 - 2
+            });
+        }
+
+        if (confettiAnimationId) cancelAnimationFrame(confettiAnimationId);
+        
+        function updateAndDraw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let hasActiveParticles = false;
+
+            confettiParticles.forEach(p => {
+                p.y += p.speedY;
+                p.x += p.speedX;
+                p.rotation += p.rotationSpeed;
+
+                // 如果碎紙屑還在舞台內，就畫出來
+                if (p.y < canvas.height) {
+                    hasActiveParticles = true;
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(p.rotation * Math.PI / 180);
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                    ctx.restore();
+                }
+            });
+
+            if (hasActiveParticles) {
+                confettiAnimationId = requestAnimationFrame(updateAndDraw);
+            } else {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+        }
+        updateAndDraw();
+    }
+
+    function stopConfetti() {
+        if (confettiAnimationId) {
+            cancelAnimationFrame(confettiAnimationId);
+            confettiAnimationId = null;
+        }
+        const canvas = document.getElementById('confetti-canvas');
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+    }
+    // --- 特效引擎結束 ---
 
     function toggleMute() {
         isMuted = !isMuted;
@@ -446,6 +504,7 @@
         }
     }
 
+    // 語音引擎
     function speak(text) {
         if (isMuted) return;
         window.speechSynthesis.cancel();
@@ -453,6 +512,30 @@
         utterance.lang = 'zh-HK'; 
         utterance.rate = 0.85; 
         window.speechSynthesis.speak(utterance);
+    }
+
+    // 生成垂直積木直行柱
+    function renderVerticalBlocks(count, type, initialCount = 0) {
+        let html = '';
+        let currentBlocks = [];
+
+        for (let i = 0; i < count; i++) {
+            if (type === 'left') {
+                if (i < initialCount) {
+                    currentBlocks.push('<div class="weight-block weight-blue">📦</div>');
+                } else {
+                    currentBlocks.push('<div class="weight-block weight-green">🎁</div>');
+                }
+            } else {
+                currentBlocks.push('<div class="weight-block weight-red">🎁</div>');
+            }
+        }
+
+        for (let j = 0; j < currentBlocks.length; j += 5) {
+            let columnSlice = currentBlocks.slice(j, j + 5);
+            html += `<div class="weight-column">${columnSlice.join('')}</div>`;
+        }
+        return html;
     }
 
     function speakHint() {
@@ -470,6 +553,7 @@
     }
 
     function switchGame(gameNum) {
+        stopConfetti(); // 切換或重置遊戲時清除過關碎紙
         currentGame = gameNum;
         document.querySelectorAll('.nav-btn').forEach((btn, idx) => {
             btn.classList.toggle('active', idx + 1 === gameNum);
@@ -479,6 +563,7 @@
         if (gameNum === 1) initGame1();
         if (gameNum === 2) initGame2();
         if (gameNum === 3) initGame3();
+        if (gameNum === 4) initGame4();
         
         setTimeout(speakHint, 300);
     }
@@ -490,7 +575,7 @@
         answer = num1 + num2; 
         gameData = { num1: num1, num2: num2 };
 
-        updateHintDisplay(`有 ${num1} 隻粉紅怪獸，又嚟咗 ${num2} 隻藍色怪獸，夾埋一共有幾多隻怪獸？`);
+        updateHintDisplay(`有 ${num1} 隻粉紅怪獸，又嚟咗 ${num2} 隻藍色怪獸，夾埋一共有幾多隻怪獸呀？`);
 
         let htmlContent = `
             <div class="formula-display" id="plus-formula">${num1} + ${num2} = </div>
@@ -507,24 +592,32 @@
         renderStage(htmlContent, generateOptions(answer));
     }
 
-    // --- 遊戲 2：數字翹翹板（物理傾斜徹底修正） ---
+    // --- 遊戲 2：數字翹翹板 ---
     function initGame2() {
-        const rightWeight = Math.floor(Math.random() * 3) + 3; // 右邊 3~5 個
-        const leftExist = Math.floor(Math.random() * (rightWeight - 1)) + 1; 
+        const rightWeight = Math.floor(Math.random() * 6) + 5; 
+        const leftExist = Math.floor(Math.random() * (rightWeight - 2)) + 1; 
         answer = rightWeight - leftExist; 
         
-        gameData = { targetRight: rightWeight, initialLeft: leftExist, currentAdded: 0, target: answer };
+        gameData = { 
+            targetRight: rightWeight, 
+            initialLeft: leftExist, 
+            currentAdded: 0, 
+            target: answer,
+            isBalancedChecked: false 
+        };
 
-        updateHintDisplay(`左邊得 ${leftExist} 個禮物，右邊有 ${rightWeight} 個。左邊要加多少份禮物，才能幫翹翹板變平衡?`);
+        updateHintDisplay(`右邊有 ${rightWeight} 個紅色禮物。請用綠色按鈕加減禮物，幫翹翹板變平衡啦！`);
 
         let htmlContent = `
-            <div class="formula-display" id="seesaw-formula">${leftExist} + 0 = ${rightWeight}</div>
+            <div class="formula-display" id="seesaw-formula" style="visibility: hidden;">⚖️ 翹翹板模擬中</div>
             
             <div class="seesaw-layout-v2">
-                <div class="stepper-horizontal">
-                    <button class="stepper-btn btn-down" onclick="changeGift(-1)">▼</button>
-                    <div class="counter-display" id="gift-counter">0</div>
-                    <button class="stepper-btn btn-up" onclick="changeGift(1)">▲</button>
+                <div class="control-zone" id="seesaw-controls">
+                    <div class="stepper-horizontal">
+                        <button class="stepper-btn btn-down" onclick="changeGift(-1)">▼</button>
+                        <div class="counter-display" id="gift-counter">0</div>
+                        <button class="stepper-btn btn-up" onclick="changeGift(1)">▲</button>
+                    </div>
                 </div>
 
                 <div class="seesaw-container-v2">
@@ -536,7 +629,7 @@
                 </div>
             </div>
             
-            <button class="submit-btn" onclick="checkSeesawAnswer()">好喇！檢查下！</button>
+            <button class="submit-btn" id="seesaw-submit" onclick="checkSeesawBalance()">好喇！檢查下！</button>
         `;
 
         renderStage(htmlContent, ''); 
@@ -544,74 +637,69 @@
     }
 
     function changeGift(val) {
+        if (gameData.isBalancedChecked) return;
         let newAdded = gameData.currentAdded + val;
-        if (newAdded < 0 || newAdded > 7) return; 
+        if (newAdded < 0 || newAdded > 10) return; 
         
         gameData.currentAdded = newAdded;
         document.getElementById('gift-counter').innerText = newAdded;
-        
-        if(val > 0) speak("加一個");
-        else speak("減一個");
-        
-        document.getElementById('seesaw-formula').innerText = `${gameData.initialLeft} + ${newAdded} = ${gameData.targetRight}`;
+        speak(val > 0 ? "加一個" : "減一個");
         updateSeesawGraphics();
     }
 
     function updateSeesawGraphics() {
         const leftZone = document.getElementById('left-zone');
         const rightZone = document.getElementById('right-zone');
-        
-        leftZone.innerHTML = '';
         const totalLeftNow = gameData.initialLeft + gameData.currentAdded;
-        for(let i = 0; i < totalLeftNow; i++) {
-            if(i < gameData.initialLeft) {
-                leftZone.innerHTML += '<div class="weight-block weight-blue">📦</div>';
-            } else {
-                leftZone.innerHTML += '<div class="weight-block weight-blue" style="background:#10B981; border-color:#047857;">🎁</div>';
-            }
-        }
         
-        rightZone.innerHTML = '';
-        for(let i = 0; i < gameData.targetRight; i++) {
-            rightZone.innerHTML += '<div class="weight-block weight-red">🎁</div>';
-        }
+        leftZone.innerHTML = renderVerticalBlocks(totalLeftNow, 'left', gameData.initialLeft);
+        rightZone.innerHTML = renderVerticalBlocks(gameData.targetRight, 'right');
 
-        // ====== 🔴 【徹底改正：天秤重力方向邏輯】 ======
-        // 1. 如果 右邊 > 左邊（右邊重），天秤要「順時針傾斜」，即右沉左翹。網頁的 rotate() 順時針是「正數」！
-        // 2. 如果 左邊 > 右邊（左邊重），天秤要「逆時針傾斜」，即左沉右翹。網頁的 rotate() 逆時針是「負數」！
-        // 
-        // 公式：角度 = (右邊重量 - 左邊重量) * 每顆積木的傾斜係數
         const currentDiff = gameData.targetRight - totalLeftNow; 
-        
-        let angle = currentDiff * 5; // 每個禮物差距產生 5 度的傾斜感
+        let angle = currentDiff * 3.5; 
         if (angle > 14) angle = 14;
         if (angle < -14) angle = -14;
-        
-        // 完美的重力方向套用
         document.getElementById('seesaw-board').style.transform = `rotate(${angle}deg)`;
     }
 
-    function checkSeesawAnswer() {
+    function checkSeesawBalance() {
         if (gameData.currentAdded === gameData.target) {
-            speak("答對喇！兩邊平衡晒，你超級叻呀！");
-            document.getElementById('game-stage').classList.add('celebrate');
+            gameData.isBalancedChecked = true;
+            speak("哇！兩邊一樣重、平衡晒喇！你睇下，算式出嚟喇！");
             document.getElementById('seesaw-board').style.transform = 'rotate(0deg)';
-            document.getElementById('seesaw-formula').innerText = `${gameData.initialLeft} + ${gameData.currentAdded} = ${gameData.targetRight}`;
-            setTimeout(() => { switchGame(2); }, 2800);
+            
+            const formulaDiv = document.getElementById('seesaw-formula');
+            formulaDiv.innerText = `${gameData.initialLeft} + ( ❓ ) = ${gameData.targetRight}`;
+            formulaDiv.style.visibility = 'visible';
+            
+            document.getElementById('seesaw-controls').style.display = 'none';
+            document.getElementById('seesaw-submit').style.display = 'none';
+            
+            updateHintDisplay(`天秤平衡喇！${gameData.initialLeft} 加幾多會等於 ${gameData.targetRight} 呀？請揀數字填落去啦！`);
+            renderOptionsZone(generateOptions(gameData.target));
         } else {
             const totalLeftNow = gameData.initialLeft + gameData.currentAdded;
-            if (totalLeftNow < gameData.targetRight) {
-                speak("唔啱喎，左邊好似仲輕咗少少，再加啲禮物試下？");
-            } else {
-                speak("唔啱喎，左邊好似重得滯喇，減返少少禮物試下？");
-            }
+            speak(totalLeftNow < gameData.targetRight ? "唔啱喎，左邊好似仲輕咗少少，再加啲綠色禮物試下？" : "唔啱喎，左邊好似重得滯喇，減返少少綠色禮物試下？");
+        }
+    }
+
+    function checkSeesawFinalAnswer(selectedNum) {
+        if (selectedNum === gameData.target) {
+            document.getElementById('seesaw-formula').innerText = `${gameData.initialLeft} + ( ${selectedNum} ) = ${gameData.targetRight}`;
+            updateHintDisplay(`好棒！${gameData.initialLeft} + ( ${selectedNum} ) = ${gameData.targetRight}`);
+            speak(`冇錯喇！${gameData.initialLeft} 加 ${selectedNum} 就等於 ${gameData.targetRight} 喇！你超級聰明！`);
+            document.getElementById('game-stage').classList.add('celebrate');
+            startConfetti(); // 🎉 觸發五彩碎紙動畫
+            setTimeout(() => { switchGame(2); }, 5000);
+        } else {
+            speak("唔啱喎，數下左邊有幾個綠色禮物？再揀多次！");
         }
     }
 
     // --- 遊戲 3 ---
     function initGame3() {
-        const totalCookies = Math.floor(Math.random() * 4) + 4; 
-        const eatCount = Math.floor(Math.random() * 3) + 1; 
+        const totalCookies = Math.floor(Math.random() * 6) + 5; 
+        const eatCount = Math.floor(Math.random() * 4) + 1; 
         answer = totalCookies - eatCount;
         gameData = { remainingToEat: eatCount, total: totalCookies, eatenSoFar: 0 };
 
@@ -622,23 +710,22 @@
             <div class="cookie-jar">
         `;
         for (let i = 0; i < totalCookies; i++) {
-            htmlContent += `<div class="cookie" onclick="eatCookie(this)"></div>`;
+            htmlContent += `<div class="cookie" onclick="eatCookie3(this)"></div>`;
         }
         htmlContent += '</div>';
 
         renderStage(htmlContent, `<div id="status-txt" style="font-size:1.3rem; color:#FF6B6B; font-weight:bold; margin-top:20px;">幫小狗點擊食餅乾 🐶</div>`);
     }
 
-    function eatCookie(element) {
+    function eatCookie3(element) {
         if (element.classList.contains('eaten') || gameData.remainingToEat <= 0) return;
-        
         element.classList.add('eaten');
         gameData.remainingToEat--;
         gameData.eatenSoFar++;
         speak("好食！");
 
         if (gameData.remainingToEat === 0) {
-            updateHintDisplay(`好叻啊！依家碟入面仲剩低幾多塊餅乾呢？`);
+            updateHintDisplay(`太棒啦！依家碟入面仲剩低幾多塊餅乾呢？選個數字啦！`);
             speak(currentHint);
             
             const formulaDiv = document.getElementById('math-formula');
@@ -647,6 +734,79 @@
             
             document.getElementById('status-txt').style.display = 'none';
             renderOptionsZone(generateOptions(answer));
+        }
+    }
+
+    // --- 遊戲 4 ---
+    function initGame4() {
+        const total = Math.floor(Math.random() * 5) + 5; 
+        const remaining = Math.floor(Math.random() * 3) + 2; 
+        const targetX = total - remaining; 
+        
+        gameData = {
+            total: total,
+            remaining: remaining,
+            targetAnswer: targetX, 
+            currentXCount: 0 
+        };
+
+        updateHintDisplay(`一開始有 ${total} 塊餅乾，最後要剩返 ${remaining} 塊。一齊幫要食掉嘅餅乾打交叉（❌）啦！`);
+
+        let htmlContent = `
+            <div class="formula-display" id="game4-formula">${total} - ( ❓ ) = ${remaining}</div>
+            <div class="cookie-jar">
+        `;
+        for (let i = 0; i < total; i++) {
+            htmlContent += `<div class="cookie" onclick="toggleCookieX(this)"></div>`;
+        }
+        htmlContent += '</div>';
+
+        renderStage(htmlContent, `
+            <div id="game4-status" style="font-size:1.2rem; color:#1A73E8; font-weight:bold; margin-top:10px; display:flex; flex-direction:column; align-items:center; gap:10px;">
+                <span>點擊餅乾打交叉（❌）代表被食掉</span>
+                <button class="submit-btn" id="game4-submit" onclick="checkGame4Cookies()">好喇！檢查下！</button>
+            </div>
+        `);
+    }
+
+    function toggleCookieX(element) {
+        if (element.classList.contains('crossed')) {
+            element.classList.remove('crossed');
+            gameData.currentXCount--;
+            speak("攞返出嚟");
+        } else {
+            element.classList.add('crossed');
+            gameData.currentXCount++;
+            speak("食一塊");
+        }
+    }
+
+    function checkGame4Cookies() {
+        if (gameData.currentXCount === gameData.targetAnswer) {
+            speak("冇錯喇！你睇下，打咗交叉嘅代表被食掉。依家請揀答案，填入空格入面啦！");
+            document.getElementById('game4-status').style.display = 'none';
+            updateHintDisplay(`咁 ${gameData.total} 減幾多會等於 ${gameData.remaining} 呀？請揀個數字填落去啦！`);
+            renderOptionsZone(generateOptions(gameData.targetAnswer));
+        } else {
+            const currentRemaining = gameData.total - gameData.currentXCount;
+            if (currentRemaining > gameData.remaining) {
+                speak(`唔啱喎，依家仲有 ${currentRemaining} 塊冇打交叉，剩得太多喇，再食多啲啦！`);
+            } else {
+                speak(`唔啱喎，依家得返 ${currentRemaining} 塊冇打交叉，食得太多喇，點多一下攞返出嚟試下？`);
+            }
+        }
+    }
+
+    function checkGame4FinalAnswer(selectedNum) {
+        if (selectedNum === gameData.targetAnswer) {
+            document.getElementById('game4-formula').innerText = `${gameData.total} - ( ${selectedNum} ) = ${gameData.remaining}`;
+            updateHintDisplay(`太棒啦！${gameData.total} - ( ${selectedNum} ) = ${gameData.remaining}`);
+            speak(`好厲害呀！${gameData.total} 塊餅乾，食咗 ${selectedNum} 塊，就真係剩返 ${gameData.remaining} 塊喇！`);
+            document.getElementById('game-stage').classList.add('celebrate');
+            startConfetti(); // 🎉 觸發五彩碎紙動畫
+            setTimeout(() => { switchGame(4); }, 5550);
+        } else {
+            speak(`唔啱喎，數下有幾多塊餅乾打咗紅色交叉（❌）？再揀多次！`);
         }
     }
 
@@ -662,20 +822,30 @@
 
     function renderStage(contentHtml, optionsArrayOrHtml) {
         const stage = document.getElementById('game-stage');
-        stage.innerHTML = contentHtml + '<div class="options-zone" id="opt-zone"></div>';
+        
+        // 為了不覆蓋畫布，每次保留畫布元素，只更新其餘內容
+        let canvasHtml = '<canvas id="confetti-canvas"></canvas>';
+        stage.innerHTML = canvasHtml + contentHtml + '<div class="options-zone" id="opt-zone"></div>';
         
         if (Array.isArray(optionsArrayOrHtml)) {
             renderOptionsZone(optionsArrayOrHtml);
         } else {
             document.getElementById('opt-zone').innerHTML = optionsArrayOrHtml;
         }
+        initConfettiCanvas(); // 每次重組舞台都重新計算一次畫布寬高
     }
 
     function renderOptionsZone(optionsArray) {
         const zone = document.getElementById('opt-zone');
         zone.innerHTML = '';
         optionsArray.forEach(num => {
-            zone.innerHTML += `<button class="option-btn" onclick="checkAnswer(${num})">${num}</button>`;
+            if (currentGame === 2) {
+                zone.innerHTML += `<button class="option-btn" onclick="checkSeesawFinalAnswer(${num})">${num}</button>`;
+            } else if (currentGame === 4) {
+                zone.innerHTML += `<button class="option-btn" onclick="checkGame4FinalAnswer(${num})">${num}</button>`;
+            } else {
+                zone.innerHTML += `<button class="option-btn" onclick="checkAnswer(${num})">${num}</button>`;
+            }
         });
     }
 
@@ -683,14 +853,14 @@
         if (selected === answer) {
             speak("答對喇！你超級叻呀！");
             document.getElementById('game-stage').classList.add('celebrate');
-            
+            startConfetti(); // 🎉 觸發五彩碎紙動畫
+
             if (currentGame === 1) {
                 document.getElementById('plus-formula').innerText = `${gameData.num1} + ${gameData.num2} = ${selected}`;
             }
             if (currentGame === 3) {
                 document.getElementById('math-formula').innerText = `${gameData.total} - ${gameData.eatenSoFar} = ${selected}`;
             }
-
             setTimeout(() => { switchGame(currentGame); }, 2800);
         } else {
             speak("唔啱，再數多次睇下？");
@@ -698,7 +868,7 @@
     }
 
     window.onload = () => { switchGame(1); };
-  </script>
+    window.onresize = () => { initConfettiCanvas(); }; // 視窗縮放時自適應
+</script>
 </body>
-
 </html>
